@@ -1,211 +1,130 @@
+import 'dart:ui';
+
+import 'package:avatar_glow/avatar_glow.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:tictactoe_game/homepage.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      home: IntroScreen(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
+class IntroScreen extends StatefulWidget {
   @override
-  State<HomePage> createState() => _HomePageState();
+  _IntroScreenState createState() => _IntroScreenState();
 }
 
-class _HomePageState extends State<HomePage> {
-  bool ohTurn = true; // O starts the game
-  List<String> displayExOh = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
-
-  var myTextStyle = const TextStyle(color: Colors.white, fontSize: 30);
-  int ohScore = 0;
-  int exScore = 0;
+class _IntroScreenState extends State<IntroScreen>
+    with SingleTickerProviderStateMixin {
+  static var myNewFont = GoogleFonts.pressStart2p(
+    textStyle: TextStyle(color: Colors.black, letterSpacing: 3),
+  );
+  static var myNewFontWhite = GoogleFonts.pressStart2p(
+    textStyle: TextStyle(color: Colors.white, letterSpacing: 3),
+  );
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[800],
-      body: Column(
-        children: [
-          Expanded(
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Player O',
-                        style: myTextStyle,
-                      ),
-                      Text(
-                        ohScore.toString(),
-                        style: myTextStyle,
-                      )
-                    ],
+    final color = Colors.white;
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.grey[900],
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 120.0),
+                  child: Text(
+                    'TIC TAC TOE',
+                    style: myNewFontWhite.copyWith(fontSize: 30),
                   ),
-                  SizedBox(
-                    width: 30,
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Player X',
-                        style: myTextStyle,
-                      ),
-                      Text(
-                        exScore.toString(),
-                        style: myTextStyle,
-                      )
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: GridView.builder(
-                itemCount: 9,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3),
-                itemBuilder: (BuildContext context, int index) {
-                  return GestureDetector(
-                    onTap: () {
-                      _tapped(index);
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey[700]!),
+              Expanded(
+                flex: 2,
+                child: Container(
+                  child: AvatarGlow(
+                    startDelay: Duration(milliseconds: 2000),
+                    glowColor: Colors.white,
+                    glowShape: BoxShape.circle,
+                    animate: true,
+                    curve: Curves.fastOutSlowIn,
+                    child: Material(
+                      elevation: 2.0,
+                      shape: CircleBorder(),
+                      color: Colors.transparent,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.grey[900],
+                        child: Container(
+                          child: Image.asset(
+                            'images/tictac.png',
+                            color: Colors.white,
+                            fit: BoxFit.scaleDown,
+                          ),
+                        ),
+                        radius: 70.0,
                       ),
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 80.0),
+                  child: Container(
+                    child: Text(
+                      'CREATE BY YASINDU',
+                      style: myNewFontWhite.copyWith(fontSize: 20),
+                    ),
+                  ),
+                ),
+              ),
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(
+                    builder: (context) {
+                      return HomePage();
+                    },
+                  ));
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(left: 40, right: 40, bottom: 60),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: EdgeInsets.all(30),
+                      color: Colors.white,
                       child: Center(
-                        child: Text(
-                          displayExOh[index],
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 40),
+                        child: Center(
+                          child: Text(
+                            'START GAME',
+                            style: myNewFont,
+                          ),
                         ),
                       ),
                     ),
-                  );
-                }),
+                  ),
+                ),
+              ),
+            ],
           ),
-          Expanded(
-            child: Container(),
-          ),
-        ],
+        ),
       ),
     );
-  }
-
-  void _tapped(int index) {
-    setState(() {
-      if (ohTurn && displayExOh[index] == ' ') {
-        displayExOh[index] = 'O';
-      } else if (!ohTurn && displayExOh[index] == ' ') {
-        displayExOh[index] = 'X';
-      }
-
-      ohTurn = !ohTurn;
-      _checkWinner();
-    });
-  }
-
-  void _checkWinner() {
-    //check 1st row
-    if (displayExOh[0] == displayExOh[1] &&
-        displayExOh[0] == displayExOh[2] &&
-        displayExOh[0] != ' ') {
-      _showWinDialog(displayExOh[0]);
-    }
-
-    //check 2nd row
-    if (displayExOh[3] == displayExOh[4] &&
-        displayExOh[3] == displayExOh[5] &&
-        displayExOh[3] != ' ') {
-      _showWinDialog(displayExOh[3]);
-    }
-
-    //check 3rd row
-    if (displayExOh[6] == displayExOh[7] &&
-        displayExOh[6] == displayExOh[8] &&
-        displayExOh[6] != ' ') {
-      _showWinDialog(displayExOh[6]);
-    }
-
-    //check 1st column
-    if (displayExOh[0] == displayExOh[3] &&
-        displayExOh[0] == displayExOh[6] &&
-        displayExOh[0] != ' ') {
-      _showWinDialog(displayExOh[0]);
-    }
-
-    //check 2nd column
-    if (displayExOh[1] == displayExOh[4] &&
-        displayExOh[1] == displayExOh[7] &&
-        displayExOh[1] != ' ') {
-      _showWinDialog(displayExOh[1]);
-    }
-
-    //check 3rd column
-    if (displayExOh[2] == displayExOh[5] &&
-        displayExOh[2] == displayExOh[8] &&
-        displayExOh[2] != ' ') {
-      _showWinDialog(displayExOh[2]);
-    }
-
-    //check diagonal (
-    if (displayExOh[6] == displayExOh[4] &&
-        displayExOh[6] == displayExOh[2] &&
-        displayExOh[6] != ' ') {
-      _showWinDialog(displayExOh[6]);
-    }
-
-    //check diagonal
-    if (displayExOh[0] == displayExOh[4] &&
-        displayExOh[0] == displayExOh[8] &&
-        displayExOh[0] != ' ') {
-      _showWinDialog(displayExOh[0]);
-    }
-  }
-
-  void _showWinDialog(String winner) {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('WINNER IS: ' + winner),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  _clearBoard();
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Play Again'),
-              )
-            ],
-          );
-        });
-
-    if (winner == 'O') {
-      ohScore++;
-    } else if (winner == 'X') {
-      exScore++;
-    }
-    _clearBoard;
-  }
-
-  void _clearBoard() {
-    setState(() {
-      for (int i = 0; i < 9; i++) {
-        displayExOh[i] = ' ';
-      }
-    });
   }
 }
